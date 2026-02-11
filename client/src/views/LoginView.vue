@@ -7,7 +7,7 @@
         <img src="/DriveCopy_Crop.png" alt="Drive Copy" class="hero-logo" width="96" height="96"/>
         <h1 class="hero-title">Drive Copy</h1>
         <p class="hero-subtitle">
-          Sao chép thư mục Google Drive được chia sẻ về Drive cá nhân của bạn — nhanh chóng, an toàn và miễn phí.
+          Công cụ miễn phí giúp bạn sao chép toàn bộ thư mục và tệp từ Google Drive được chia sẻ sang Drive cá nhân của bạn.
         </p>
         <a href="/auth/google" class="google-login-btn" id="google-login-btn">
           <svg width="20" height="20" viewBox="0 0 24 24">
@@ -18,6 +18,12 @@
           </svg>
           <span>Đăng nhập với Google</span>
         </a>
+        
+        <div class="hero-links">
+          <router-link to="/privacy">Chính sách Quyền riêng tư</router-link>
+          <span class="dot">·</span>
+          <router-link to="/terms">Điều khoản Dịch vụ</router-link>
+        </div>
       </div>
 
       <!-- ====== MỤC ĐÍCH ỨNG DỤNG ====== -->
@@ -260,6 +266,26 @@ export default {
   line-height: 1.65;
   max-width: 500px;
   margin: 0 auto 20px;
+}
+
+.hero-links {
+  margin-top: 16px;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.hero-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.hero-links a:hover {
+  text-decoration: underline;
+  color: var(--accent);
+}
+.hero-links .dot {
+  color: var(--border-color);
 }
 
 /* ====== Google Login Button ====== */
