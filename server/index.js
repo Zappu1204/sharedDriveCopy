@@ -18,6 +18,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Trust Nginx proxy (Critical for secure cookies in production)
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'drive-copy-secret-change-me',
   resave: false,
