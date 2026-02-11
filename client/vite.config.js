@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 5173,
+    allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'localhost:3000', 'drivecopy.app'],
     proxy: {
       '/auth': {
         target: 'http://localhost:3000',
