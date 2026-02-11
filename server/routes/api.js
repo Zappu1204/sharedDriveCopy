@@ -154,14 +154,30 @@ router.get('/folders', requireAuth, async (req, res) => {
     }
 });
 
-// POST /api/copy - Start copy operation
+// POST /api/copy - Start copy operation (supports multiple source URLs)
 router.post('/copy', requireAuth, async (req, res) => {
-    const { sourceUrl, destFolderId, excludedStrings = [], createNewFolder } = req.body;
+    const { sourceUrls, sourceUrl, destFolderId, excludedStrings = [], createNewFolder } = req.body;
 
-    // Validate source URL
-    const sourceFolderId = extractFolderIdFromUrl(sourceUrl);
-    if (!sourceFolderId) {
-        return res.status(400).json({ error: 'Invalid source URL. Cannot extract folder ID.' });
+    // Support both array (new) and single string (legacy)
+    let urls = [];
+    if (Array.isArray(sourceUrls) && sourceUrls.length) {
+        urls = sourceUrls;
+    } else if (sourceUrl) {
+        urls = [sourceUrl];
+    }
+
+    // Extract folder IDs
+    const sourceFolderIds = [];
+    for (const url of urls) {
+        const fid = extractFolderIdFromUrl(url);
+        if (!fid) {
+            return res.status(400).json({ error: `Invalid URL: ${url.slice(0, 80)}` });
+        }
+        sourceFolderIds.push(fid);
+    }
+
+    if (!sourceFolderIds.length) {
+        return res.status(400).json({ error: 'No valid source URLs provided.' });
     }
 
     // Create job ID
@@ -185,7 +201,7 @@ router.post('/copy', requireAuth, async (req, res) => {
 
     // Start copy in background
     const drive = makeDriveClient(req.session.tokens);
-    runCopyJob(drive, jobId, sourceFolderId, destFolderId, excludedStrings, createNewFolder);
+    runCopyJob(drive, jobId, sourceFolderIds, destFolderId, excludedStrings, createNewFolder);
 });
 
 // GET /api/copy-progress/:jobId - SSE endpoint for progress
@@ -270,74 +286,92 @@ function addLog(job, level, message, details = null) {
     sendSSE(job, { type: 'log', ...log });
 }
 
-// Recursive copy logic
-async function runCopyJob(drive, jobId, sourceFolderId, destFolderId, excludedStrings, createNewFolder) {
+// Recursive copy logic — supports multiple source folders
+async function runCopyJob(drive, jobId, sourceFolderIds, destFolderId, excludedStrings, createNewFolder) {
     const job = copyJobs.get(jobId);
     if (!job) return;
 
     try {
-        // 1. Get source folder info
-        addLog(job, 'info', '🔍 Checking source folder...');
-        let sourceFolder;
-        try {
-            const res = await drive.files.get({
-                fileId: sourceFolderId,
-                fields: 'id, name, owners',
-                supportsAllDrives: true,
-            });
-            sourceFolder = res.data;
-        } catch (e) {
+        const totalSources = sourceFolderIds.length;
+        addLog(job, 'info', `🔍 Checking ${totalSources} source folder(s)...`);
+
+        // 1. Gather info for all source folders
+        const sourceFolders = [];
+        for (let i = 0; i < sourceFolderIds.length; i++) {
+            const fid = sourceFolderIds[i];
+            try {
+                const res = await drive.files.get({
+                    fileId: fid,
+                    fields: 'id, name, owners',
+                    supportsAllDrives: true,
+                });
+                sourceFolders.push(res.data);
+                addLog(job, 'success', `📂 [${i + 1}/${totalSources}] Source: "${res.data.name}"`);
+            } catch (e) {
+                addLog(job, 'error', `❌ [${i + 1}/${totalSources}] Cannot access folder ID: ${fid}`);
+                // Skip this folder but continue with others
+            }
+        }
+
+        if (!sourceFolders.length) {
             job.status = 'error';
-            job.error = 'Cannot access source folder. Please check permissions.';
+            job.error = 'Cannot access any source folder. Please check permissions.';
             addLog(job, 'error', job.error);
             sendSSE(job, { type: 'status', ...getJobStatus(job) });
             return;
         }
 
-        addLog(job, 'success', `📂 Source folder: "${sourceFolder.name}"`);
-
-        // 2. Determine destination
-        let finalDestId = destFolderId;
-        if (createNewFolder || !destFolderId) {
-            addLog(job, 'info', '📁 Creating destination folder in My Drive...');
-            try {
-                const destFolder = await drive.files.create({
-                    requestBody: {
-                        name: `[Copy] ${sourceFolder.name}`,
-                        mimeType: 'application/vnd.google-apps.folder',
-                        parents: destFolderId ? [destFolderId] : ['root'],
-                    },
-                    fields: 'id, name',
-                });
-                finalDestId = destFolder.data.id;
-                addLog(job, 'success', `📁 Created folder: "${destFolder.data.name}"`);
-            } catch (e) {
-                job.status = 'error';
-                job.error = `Failed to create destination folder: ${e.message}`;
-                addLog(job, 'error', job.error);
-                sendSSE(job, { type: 'status', ...getJobStatus(job) });
-                return;
-            }
-        }
-
-        job.destFolderId = finalDestId;
-
-        // 3. Count total files first
+        // 2. Count total files across all sources
         addLog(job, 'info', '📊 Counting files...');
-        const totalCount = await countFilesRecursive(drive, sourceFolderId, excludedStrings);
-        job.totalFiles = totalCount;
-        addLog(job, 'info', `📊 Total items to copy: ${totalCount}`);
+        let grandTotal = 0;
+        for (const sf of sourceFolders) {
+            const count = await countFilesRecursive(drive, sf.id, excludedStrings);
+            grandTotal += count;
+        }
+        job.totalFiles = grandTotal;
+        addLog(job, 'info', `📊 Total items to copy: ${grandTotal} (from ${sourceFolders.length} folder(s))`);
         sendSSE(job, { type: 'status', ...getJobStatus(job) });
 
-        // 4. Start recursive copy
-        addLog(job, 'info', '🚀 Starting copy...');
-        await copyFolderRecursive(drive, job, sourceFolderId, finalDestId, excludedStrings, '');
+        // 3. Copy each source folder
+        for (let i = 0; i < sourceFolders.length; i++) {
+            const sf = sourceFolders[i];
+            const prefix = sourceFolders.length > 1 ? `[${i + 1}/${sourceFolders.length}] ` : '';
 
-        // 5. Complete
+            // Determine destination for this source
+            let finalDestId = destFolderId;
+            if (createNewFolder || !destFolderId) {
+                addLog(job, 'info', `${prefix}📁 Creating destination folder for "${sf.name}"...`);
+                try {
+                    const destFolder = await drive.files.create({
+                        requestBody: {
+                            name: `[Copy] ${sf.name}`,
+                            mimeType: 'application/vnd.google-apps.folder',
+                            parents: destFolderId ? [destFolderId] : ['root'],
+                        },
+                        fields: 'id, name',
+                    });
+                    finalDestId = destFolder.data.id;
+                    addLog(job, 'success', `${prefix}📁 Created: "${destFolder.data.name}"`);
+                } catch (e) {
+                    addLog(job, 'error', `${prefix}❌ Failed to create destination: ${e.message}`);
+                    continue; // Skip this source, try next
+                }
+            }
+
+            // Save the last dest folder ID for the "Open in Drive" button
+            job.destFolderId = finalDestId;
+
+            // Copy recursively
+            addLog(job, 'info', `${prefix}🚀 Copying "${sf.name}"...`);
+            await copyFolderRecursive(drive, job, sf.id, finalDestId, excludedStrings, '');
+            addLog(job, 'success', `${prefix}✅ Done copying "${sf.name}"`);
+        }
+
+        // 4. Complete
         job.status = 'completed';
         const elapsed = ((Date.now() - job.startTime) / 1000).toFixed(1);
         const sizeMB = (job.totalSize / (1024 * 1024)).toFixed(2);
-        addLog(job, 'success', `✅ Copy completed! ${job.copiedFiles} files copied (${sizeMB} MB) in ${elapsed}s`);
+        addLog(job, 'success', `✅ All done! ${job.copiedFiles} files copied (${sizeMB} MB) in ${elapsed}s`);
         if (job.skippedFiles > 0) {
             addLog(job, 'warning', `⚠️ ${job.skippedFiles} files skipped (excluded)`);
         }

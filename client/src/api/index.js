@@ -24,8 +24,8 @@ export const checkAccess = (folderId) =>
     api.get(`/api/check-access/${folderId}`)
 
 // Copy
-export const startCopy = (sourceUrl, destFolderId, excludedStrings, createNewFolder) =>
-    api.post('/api/copy', { sourceUrl, destFolderId, excludedStrings, createNewFolder })
+export const startCopy = (sourceUrls, destFolderId, excludedStrings, createNewFolder) =>
+    api.post('/api/copy', { sourceUrls, destFolderId, excludedStrings, createNewFolder })
 
 export const getCopyStatus = (jobId) =>
     api.get(`/api/copy-status/${jobId}`)

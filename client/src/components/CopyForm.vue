@@ -1,6 +1,6 @@
 <template>
   <div class="copy-form">
-    <!-- Step 1: Source URL -->
+    <!-- Step 1: Source URLs -->
     <div class="card form-section">
       <div class="section-header">
         <div class="section-icon step-1">
@@ -11,26 +11,26 @@
         </div>
         <div>
           <h2>Bước 1: Link thư mục nguồn</h2>
-          <p class="section-desc">Dán link Google Drive thư mục được chia sẻ với bạn</p>
+          <p class="section-desc">Dán một hoặc nhiều link Google Drive, mỗi link một dòng hoặc cách nhau bằng dấu phẩy</p>
         </div>
       </div>
 
       <div class="input-group">
         <label for="source-url">Link thư mục Google Drive</label>
         <div class="input-with-action">
-          <input
+          <textarea
             id="source-url"
-            type="text"
-            class="input"
-            v-model="sourceUrl"
-            placeholder="https://drive.google.com/drive/folders/..."
-            @input="resetSourceInfo"
+            class="input source-textarea"
+            v-model="sourceUrlInput"
+            placeholder="https://drive.google.com/drive/folders/abc123&#10;https://drive.google.com/drive/folders/def456"
+            @input="onSourceInputChange"
             :disabled="copying"
-          />
+            rows="2"
+          ></textarea>
           <button
             class="btn btn-primary btn-sm"
-            @click="checkSource"
-            :disabled="!sourceUrl || checkingSource || copying"
+            @click="checkAllSources"
+            :disabled="!sourceUrlInput.trim() || checkingSource || copying"
             id="check-source-btn"
           >
             <span v-if="checkingSource" class="spinner" style="width:14px;height:14px;border-width:2px"></span>
@@ -39,37 +39,36 @@
         </div>
       </div>
 
-      <!-- Source Info -->
-      <div v-if="sourceInfo" class="source-info fade-in">
-        <div class="info-card info-success">
-          <div class="info-row">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span><strong>Có quyền truy cập</strong></span>
-          </div>
-          <div class="info-details">
-            <div class="info-detail">
-              <span class="label">Tên thư mục:</span>
-              <span class="value">{{ sourceInfo.name }}</span>
+      <!-- Verified Sources List -->
+      <div v-if="sources.length" class="sources-list fade-in">
+        <div
+          v-for="(src, i) in sources"
+          :key="i"
+          class="source-card"
+          :class="{ 'source-ok': src.status === 'ok', 'source-err': src.status === 'error', 'source-checking': src.status === 'checking' }"
+        >
+          <div class="source-card-header">
+            <div class="source-index">{{ i + 1 }}</div>
+            <div class="source-card-body">
+              <div class="source-name">
+                <span v-if="src.status === 'checking'" class="spinner" style="width:12px;height:12px;border-width:2px"></span>
+                <svg v-else-if="src.status === 'ok'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <strong v-if="src.info">{{ src.info.name }}</strong>
+                <span v-else class="source-url-preview">{{ src.url.slice(0, 60) }}{{ src.url.length > 60 ? '...' : '' }}</span>
+              </div>
+              <div v-if="src.info" class="source-meta">
+                {{ src.info.itemCount }} items
+                <span v-if="src.info.owners && src.info.owners.length"> · {{ src.info.owners.map(o => o.displayName || o.emailAddress).join(', ') }}</span>
+              </div>
+              <div v-if="src.error" class="source-error-msg">{{ src.error }}</div>
             </div>
-            <div class="info-detail" v-if="sourceInfo.owners && sourceInfo.owners.length">
-              <span class="label">Chủ sở hữu:</span>
-              <span class="value">{{ sourceInfo.owners.map(o => o.displayName || o.emailAddress).join(', ') }}</span>
-            </div>
-            <div class="info-detail">
-              <span class="label">Email của bạn:</span>
-              <span class="value">{{ sourceInfo.userEmail }}</span>
-            </div>
-            <div class="info-detail">
-              <span class="label">Số mục trong folder:</span>
-              <span class="value">{{ sourceInfo.itemCount }} items</span>
-            </div>
-            <!-- <div class="info-detail" v-if="sourceInfo.capabilities">
-              <span class="label">Quyền copy:</span>
-              <span class="value">
-                <span v-if="sourceInfo.capabilities.canCopy !== false" class="badge badge-success">Có thể copy</span>
-                <span v-else class="badge badge-error">Không thể copy</span>
-              </span>
-            </div> -->
+            <button
+              v-if="!copying"
+              class="btn-remove-source"
+              @click="removeSource(i)"
+              title="Xóa"
+            >&times;</button>
           </div>
         </div>
       </div>
@@ -83,7 +82,7 @@
     </div>
 
     <!-- Step 2: Destination -->
-    <div class="card form-section" v-if="sourceInfo">
+    <div class="card form-section" v-if="validSources.length">
       <div class="section-header">
         <div class="section-icon step-2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -105,7 +104,10 @@
             </svg>
             <div>
               <div class="radio-title">Tạo thư mục mới</div>
-              <div class="radio-desc">Tự động tạo "[Copy] {{ sourceInfo.name }}" trong My Drive</div>
+              <div class="radio-desc">
+                <template v-if="validSources.length === 1">Tự động tạo "[Copy] {{ validSources[0].info.name }}" trong My Drive</template>
+                <template v-else>Tạo {{ validSources.length }} thư mục "[Copy] ..." trong My Drive</template>
+              </div>
             </div>
           </div>
         </label>
@@ -139,7 +141,7 @@
     </div>
 
     <!-- Step 3: Options -->
-    <div class="card form-section" v-if="sourceInfo">
+    <div class="card form-section" v-if="validSources.length">
       <div class="section-header">
         <div class="section-icon step-3">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -174,16 +176,23 @@
     </div>
 
     <!-- Start Copy Button -->
-    <div v-if="sourceInfo" class="copy-action fade-in">
+    <div v-if="validSources.length" class="copy-action fade-in">
       <div class="copy-summary card">
         <div class="summary-row">
           <span class="summary-label">Nguồn:</span>
-          <span class="summary-value">{{ sourceInfo.name }}</span>
+          <span class="summary-value">
+            <template v-if="validSources.length === 1">{{ validSources[0].info.name }}</template>
+            <template v-else>{{ validSources.length }} thư mục</template>
+          </span>
         </div>
         <div class="summary-row">
           <span class="summary-label">Đích:</span>
           <span class="summary-value">
-            {{ destMode === 'new' ? `[Copy] ${sourceInfo.name} (My Drive)` : (selectedFolder ? selectedFolder.name : 'Chưa chọn') }}
+            <template v-if="destMode === 'new'">
+              <template v-if="validSources.length === 1">[Copy] {{ validSources[0].info.name }} (My Drive)</template>
+              <template v-else>{{ validSources.length }} thư mục "[Copy] ..." (My Drive)</template>
+            </template>
+            <template v-else>{{ selectedFolder ? selectedFolder.name : 'Chưa chọn' }}</template>
           </span>
         </div>
         <div class="summary-row" v-if="parsedExcludes.length">
@@ -205,7 +214,7 @@
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
         </svg>
         <span v-if="copying" class="spinner"></span>
-        <span>{{ copying ? 'Đang copy...' : 'Bắt đầu Copy' }}</span>
+        <span>{{ copying ? 'Đang copy...' : `Bắt đầu Copy${validSources.length > 1 ? ` (${validSources.length} thư mục)` : ''}` }}</span>
       </button>
 
       <!-- After copy done: show "Copy link khác" -->
@@ -236,8 +245,8 @@ export default {
   emits: ['copy-started', 'reset'],
   data() {
     return {
-      sourceUrl: '',
-      sourceInfo: null,
+      sourceUrlInput: '',
+      sources: [],       // [{ url, status: 'pending'|'checking'|'ok'|'error', info, error }]
       sourceError: null,
       checkingSource: false,
       destMode: 'new',
@@ -254,35 +263,59 @@ export default {
         .map(s => s.trim())
         .filter(s => s.length > 0)
     },
+    validSources() {
+      return this.sources.filter(s => s.status === 'ok' && s.info)
+    },
   },
   methods: {
-    resetSourceInfo() {
-      this.sourceInfo = null
+    parseUrls(text) {
+      // Split by comma, newline, or space sequences
+      return text
+        .split(/[,\n]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && (s.startsWith('http') || s.match(/[-\w]{25,}/)))
+    },
+    onSourceInputChange() {
       this.sourceError = null
+    },
+    removeSource(index) {
+      this.sources.splice(index, 1)
     },
     removeExclude(index) {
       const parts = this.excludeInput.split(',').map(s => s.trim()).filter(s => s.length > 0)
       parts.splice(index, 1)
       this.excludeInput = parts.join(', ')
     },
-    async checkSource() {
+    async checkAllSources() {
+      const urls = this.parseUrls(this.sourceUrlInput)
+      if (!urls.length) {
+        this.sourceError = 'Không tìm thấy link Google Drive hợp lệ'
+        return
+      }
+
       this.checkingSource = true
       this.sourceError = null
-      this.sourceInfo = null
+      this.sources = urls.map(url => ({ url, status: 'checking', info: null, error: null }))
 
-      try {
-        // Extract folder ID
-        const urlRes = await checkUrl(this.sourceUrl)
-        const folderId = urlRes.data.folderId
+      // Check each URL in parallel
+      const promises = this.sources.map(async (src, i) => {
+        try {
+          const urlRes = await checkUrl(src.url)
+          const folderId = urlRes.data.folderId
+          const accessRes = await checkAccess(folderId)
+          this.sources[i].info = accessRes.data
+          this.sources[i].status = 'ok'
+        } catch (err) {
+          this.sources[i].error = err.response?.data?.error || err.message || 'Không thể kiểm tra'
+          this.sources[i].status = 'error'
+        }
+      })
 
-        // Check access
-        const accessRes = await checkAccess(folderId)
-        this.sourceInfo = accessRes.data
-      } catch (err) {
-        const msg = err.response?.data?.error || err.message || 'Không thể kiểm tra thư mục'
-        this.sourceError = msg
-      } finally {
-        this.checkingSource = false
+      await Promise.all(promises)
+      this.checkingSource = false
+
+      if (!this.validSources.length) {
+        this.sourceError = 'Không có thư mục nào kiểm tra thành công'
       }
     },
     onFolderSelected(folder) {
@@ -296,8 +329,11 @@ export default {
         const destId = this.destMode === 'pick' ? this.selectedFolder?.id : null
         const createNew = this.destMode === 'new'
 
+        // Collect valid source URLs
+        const sourceUrls = this.validSources.map(s => s.url)
+
         const res = await startCopy(
-          this.sourceUrl,
+          sourceUrls,
           destId,
           this.parsedExcludes,
           createNew
@@ -311,8 +347,8 @@ export default {
       }
     },
     resetForm() {
-      this.sourceUrl = ''
-      this.sourceInfo = null
+      this.sourceUrlInput = ''
+      this.sources = []
       this.sourceError = null
       this.checkingSource = false
       this.destMode = 'new'
@@ -372,6 +408,7 @@ export default {
 .input-with-action {
   display: flex;
   gap: 8px;
+  align-items: flex-start;
 }
 .input-with-action .input {
   flex: 1;
@@ -379,9 +416,119 @@ export default {
 .input-with-action .btn {
   flex-shrink: 0;
   min-width: 90px;
+  margin-top: 2px;
 }
 
-/* Source Info */
+/* Source textarea */
+.source-textarea {
+  resize: vertical;
+  min-height: 44px;
+  max-height: 160px;
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+/* Sources list */
+.sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.source-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  transition: all var(--transition);
+}
+.source-card.source-ok {
+  border-color: rgba(52, 168, 83, 0.3);
+  background: var(--success-light);
+}
+.source-card.source-err {
+  border-color: rgba(234, 67, 53, 0.3);
+  background: var(--error-light);
+}
+.source-card.source-checking {
+  border-color: rgba(66, 133, 244, 0.3);
+  background: var(--accent-lighter);
+}
+
+.source-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.source-index {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.source-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.source-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+}
+.source-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-url-preview {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-meta {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.source-error-msg {
+  font-size: 0.75rem;
+  color: var(--error);
+  margin-top: 2px;
+}
+
+.btn-remove-source {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-tertiary);
+  padding: 0 4px;
+  transition: color var(--transition);
+}
+.btn-remove-source:hover {
+  color: var(--error);
+}
+
+/* Source Info (legacy single) */
 .source-info {
   margin-top: 16px;
 }
