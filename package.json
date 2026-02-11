@@ -1,0 +1,25 @@
+{
+  "name": "drive-copy-app",
+  "version": "1.0.0",
+  "description": "Web app to copy shared Google Drive folders to personal Drive",
+  "main": "server/index.js",
+  "scripts": {
+    "dev:server": "node server/index.js",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "install:all": "npm install && cd client && npm install",
+    "build:client": "cd client && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "cors": "^2.8.5",
+    "googleapis": "^128.0.0",
+    "google-auth-library": "^9.4.1",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
