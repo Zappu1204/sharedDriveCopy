@@ -54,9 +54,9 @@
           <span class="footer-desc">Sao chép Google Drive an toàn</span>
         </div>
         <div class="footer-links">
-          <router-link to="/privacy">Quyền riêng tư</router-link>
+          <a href="https://drivecopy.app/privacy">Privacy Policy - Quyền riêng tư</a>
           <span class="footer-dot">·</span>
-          <router-link to="/terms">Điều khoản</router-link>
+          <a href="https://drivecopy.app/terms">Terms of Service - Điều khoản</a>
           <span class="footer-dot">·</span>
           <a href="mailto:support@drivecopy.app">Liên hệ</a>
         </div>
