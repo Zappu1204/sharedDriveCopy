@@ -5,16 +5,201 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon2.png" sizes="32x32" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Copy shared Google Drive folders to your personal Drive easily and securely." />
-  <title>Drive Copy — Sao chép Google Drive được chia sẻ</title>
+  <meta name="description"
+    content="Drive Copy — Công cụ miễn phí giúp sao chép thư mục Google Drive được chia sẻ sang Drive cá nhân. An toàn, đệ quy, sử dụng Google Drive API v3." />
+  <title>Drive Copy — Sao chép thư mục Google Drive được chia sẻ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
+
+  <style>
+    .static-landing {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+
+    .static-landing .hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .static-landing .hero img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 12px;
+    }
+
+    .static-landing .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #4285f4;
+      margin: 0 0 8px;
+    }
+
+    .static-landing .hero p {
+      font-size: 1rem;
+      color: #555;
+      max-width: 520px;
+      margin: 0 auto 20px;
+    }
+
+    .static-landing .hero .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 28px;
+      background: #fff;
+      border: 2px solid #e2e5ed;
+      border-radius: 8px;
+      color: #3c4043;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .static-landing .hero .cta-btn:hover {
+      border-color: #4285f4;
+      color: #1a73e8;
+    }
+
+    .static-landing section {
+      margin-bottom: 28px;
+    }
+
+    .static-landing h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .static-landing ul {
+      padding-left: 22px;
+    }
+
+    .static-landing li {
+      margin-bottom: 4px;
+    }
+
+    .static-landing code {
+      background: #f0f0f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    .static-landing a {
+      color: #4285f4;
+    }
+
+    .static-landing .policy-links {
+      text-align: center;
+      padding: 20px 0;
+      border-top: 1px solid #eee;
+      margin-top: 32px;
+      font-size: 0.875rem;
+    }
+
+    .static-landing .policy-links a {
+      margin: 0 8px;
+    }
+
+    .static-landing .footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 12px;
+    }
+  </style>
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <!--
+      Nội dung HTML tĩnh — hiển thị cho bot, crawler, hoặc khi JavaScript bị tắt.
+      Khi Vue.js load xong, nội dung này sẽ được thay thế bởi SPA.
+    -->
+    <div class="static-landing">
+      <div class="hero">
+        <img src="/DriveCopy_Crop.png" alt="Drive Copy Logo" width="80" height="80" />
+        <h1>Drive Copy</h1>
+        <p>Công cụ miễn phí giúp bạn sao chép toàn bộ thư mục Google Drive được chia sẻ sang Drive cá nhân — an toàn và
+          giữ nguyên cấu trúc.</p>
+        <a href="/auth/google" class="cta-btn">Đăng nhập với Google</a>
+      </div>
+
+      <section>
+        <h2>Mục đích ứng dụng</h2>
+        <p>
+          <strong>Drive Copy</strong> giúp người dùng Google Drive sao chép toàn bộ nội dung thư mục được chia sẻ về
+          Drive cá nhân.
+          Google Drive thông thường chỉ cho phép "Thêm lối tắt" (Add shortcut) cho thư mục được chia sẻ —
+          Drive Copy giải quyết vấn đề này bằng cách tạo bản sao thực sự cho tất cả files và thư mục con
+          thông qua <strong>Google Drive API v3</strong>.
+        </p>
+        <p>
+          Mọi thao tác sao chép diễn ra trực tiếp trên hạ tầng Google.
+          <strong>Không có dữ liệu nào được tải xuống hoặc đi qua server của chúng tôi.</strong>
+        </p>
+      </section>
+
+      <section>
+        <h2>Tính năng chính</h2>
+        <ul>
+          <li><strong>Sao chép đệ quy</strong> — Copy toàn bộ cây thư mục, giữ nguyên cấu trúc gốc.</li>
+          <li><strong>Nhiều link cùng lúc</strong> — Dán nhiều link Google Drive để copy nhiều thư mục cùng một lượt.
+          </li>
+          <li><strong>Theo dõi real-time</strong> — Xem tiến trình sao chép trực tiếp với log chi tiết.</li>
+          <li><strong>Chọn thư mục đích</strong> — Tạo mới hoặc chọn thư mục có sẵn trong Drive cá nhân.</li>
+          <li><strong>Lọc files</strong> — Bỏ qua files/folders theo tên (ví dụ: .mp4, .srt).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Quyền truy cập Google API</h2>
+        <p>Khi đăng nhập, ứng dụng yêu cầu các quyền sau:</p>
+        <ul>
+          <li><code>https://www.googleapis.com/auth/drive</code> — Để đọc danh sách files trong thư mục chia sẻ, sao
+            chép files, và tạo thư mục trong Drive của bạn.</li>
+          <li><code>https://www.googleapis.com/auth/userinfo.email</code> — Để hiển thị email trên giao diện.</li>
+          <li><code>https://www.googleapis.com/auth/userinfo.profile</code> — Để hiển thị tên và ảnh đại diện.</li>
+        </ul>
+        <p>Bạn có thể thu hồi quyền truy cập bất kỳ lúc nào tại <a href="https://myaccount.google.com/permissions"
+            target="_blank" rel="noopener">Google Account Permissions</a>.</p>
+      </section>
+
+      <section>
+        <h2>Bảo mật &amp; Quyền riêng tư</h2>
+        <ul>
+          <li><strong>Không lưu trữ dữ liệu</strong> — Chúng tôi không lưu files, thông tin cá nhân, hay metadata vào
+            database.</li>
+          <li><strong>Không tải file về server</strong> — Nội dung files được copy trực tiếp giữa các Google Drive thông
+            qua API.</li>
+          <li><strong>Token tạm thời</strong> — Access token chỉ lưu trong session tạm, tự động xóa khi đăng xuất.</li>
+          <li><strong>Mã hóa HTTPS</strong> — Mọi kết nối đều qua HTTPS, cookie httpOnly với SameSite policy.</li>
+          <li><strong>Tuân thủ Google API</strong> — Ứng dụng tuân thủ <a
+              href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank"
+              rel="noopener">Google API Services User Data Policy</a>, bao gồm Limited Use requirements.</li>
+        </ul>
+      </section>
+
+      <div class="policy-links">
+        <a href="https://drivecopy.app/privacy">Chính sách Quyền riêng tư</a> ·
+        <a href="https://drivecopy.app/terms">Điều khoản Dịch vụ</a> ·
+        <a href="mailto:support@drivecopy.app">Liên hệ</a>
+      </div>
+      <div class="footer-note">
+        &copy; 2026 Drive Copy. Không liên kết với Google Inc.
+      </div>
+    </div>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 

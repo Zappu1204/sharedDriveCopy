@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Chính sách Quyền riêng tư của Drive Copy — Cách chúng tôi xử lý dữ liệu khi sao chép thư mục Google Drive." />
+    <title>Chính sách Quyền riêng tư — Drive Copy</title>
+    <link rel="icon" type="image/png" href="/favicon2.png" sizes="32x32" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1a1a2e;
+            background: #f8f9fc;
+            line-height: 1.7;
+        }
+
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-size: 0.875rem;
+        }
+
+        .nav a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .nav span {
+            color: #aaa;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .updated {
+            font-size: 0.8125rem;
+            color: #888;
+            margin-bottom: 28px;
+        }
+
+        section {
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e8e8ee;
+        }
+
+        h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 14px 0 8px;
+        }
+
+        p {
+            font-size: 0.875rem;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+        ul,
+        ol {
+            padding-left: 22px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            font-size: 0.875rem;
+            color: #444;
+            margin-bottom: 4px;
+        }
+
+        code {
+            background: #eef0f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #4285f4;
+        }
+
+        a {
+            color: #4285f4;
+        }
+
+        .callout {
+            background: #fff8e1;
+            border-left: 3px solid #f9ab00;
+            padding: 12px 16px;
+            border-radius: 0 6px 6px 0;
+            margin: 12px 0;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #aaa;
+            border-top: 1px solid #e8e8ee;
+            padding-top: 20px;
+            margin-top: 32px;
+        }
+
+        .footer a {
+            color: #4285f4;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="nav">
+            <a href="https://drivecopy.app">← Trang chủ</a>
+            <span>|</span>
+            <a href="https://drivecopy.app/terms">Điều khoản Dịch vụ</a>
+        </div>
+
+        <h1>Chính sách Quyền riêng tư</h1>
+        <p class="updated">Cập nhật lần cuối: 20 tháng 2, 2026</p>
+
+        <section>
+            <h2>1. Giới thiệu</h2>
+            <p>
+                Chào mừng bạn đến <strong>Drive Copy</strong> (truy cập tại <a
+                    href="https://drivecopy.app">https://drivecopy.app</a>).
+                Ứng dụng này cho phép bạn sao chép thư mục Google Drive được chia sẻ sang Drive cá nhân một cách nhanh
+                chóng và an toàn.
+            </p>
+            <p>
+                Chính sách Quyền riêng tư này mô tả cách chúng tôi thu thập, sử dụng, lưu trữ và bảo vệ thông tin cá
+                nhân của bạn khi sử dụng Dịch vụ.
+                Khi sử dụng Dịch vụ, bạn đồng ý với các điều khoản trong Chính sách này.
+            </p>
+        </section>
+
+        <section>
+            <h2>2. Thông tin chúng tôi thu thập</h2>
+
+            <h3>2.1. Thông tin tài khoản Google</h3>
+            <p>Khi đăng nhập bằng Google OAuth 2.0, chúng tôi truy cập các thông tin sau:</p>
+            <ul>
+                <li><strong>Tên hiển thị:</strong> Để cá nhân hóa giao diện người dùng.</li>
+                <li><strong>Địa chỉ email:</strong> Để xác định tài khoản và phiên đăng nhập.</li>
+                <li><strong>Ảnh đại diện:</strong> Để hiển thị avatar trong header.</li>
+            </ul>
+            <p>Chúng tôi <strong>không</strong> thu thập hay biết mật khẩu Google của bạn. Quá trình xác thực được xử lý
+                hoàn toàn bởi Google.</p>
+
+            <h3>2.2. Dữ liệu Google Drive</h3>
+            <p>Ứng dụng yêu cầu quyền truy cập Google Drive với scope sau:</p>
+            <ul>
+                <li><code>https://www.googleapis.com/auth/drive</code> — Toàn quyền truy cập Google Drive.</li>
+            </ul>
+            <p>Scope này cần thiết để:</p>
+            <ul>
+                <li>Liệt kê files và folders trong thư mục chia sẻ (<code>files.list</code>).</li>
+                <li>Sao chép files từ thư mục chia sẻ sang Drive cá nhân (<code>files.copy</code>).</li>
+                <li>Tạo thư mục mới trong Drive của bạn (<code>files.create</code>).</li>
+                <li>Liệt kê thư mục của bạn để chọn nơi lưu.</li>
+            </ul>
+            <div class="callout">
+                <p><strong>⚠️ Quan trọng:</strong> Ứng dụng KHÔNG tải xuống, lưu trữ, hoặc truyền bất kỳ nội dung file
+                    nào qua server của chúng tôi.
+                    Mọi thao tác sao chép được thực thi trực tiếp giữa các tài khoản Google Drive thông qua Google Drive
+                    API.</p>
+            </div>
+
+            <h3>2.3. Dữ liệu kỹ thuật</h3>
+            <p>Chúng tôi có thể tự động thu thập:</p>
+            <ul>
+                <li>Thông tin trình duyệt và thiết bị (User-Agent) cho mục đích gỡ lỗi.</li>
+                <li>Dữ liệu phiên tạm thời để duy trì trạng thái đăng nhập.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. Cách chúng tôi sử dụng thông tin</h2>
+            <p>Thông tin của bạn được sử dụng <strong>chỉ</strong> cho các mục đích sau:</p>
+            <ul>
+                <li>Xác thực và duy trì phiên đăng nhập.</li>
+                <li>Thực hiện các thao tác sao chép files/folders theo yêu cầu của bạn.</li>
+                <li>Hiển thị thông tin tài khoản (tên, email, avatar) trên bảng điều khiển.</li>
+                <li>Cung cấp cập nhật tiến trình sao chép theo thời gian thực.</li>
+            </ul>
+            <p>Chúng tôi <strong>không</strong> sử dụng dữ liệu của bạn cho quảng cáo, phân tích bên thứ ba, hoặc bất kỳ
+                mục đích thương mại nào khác.</p>
+        </section>
+
+        <section>
+            <h2>4. Lưu trữ và bảo mật dữ liệu</h2>
+
+            <h3>4.1. Access Token</h3>
+            <ul>
+                <li>Token xác thực Google được <strong>chỉ lưu trong phiên</strong> (bộ nhớ tạm trên server).</li>
+                <li>Token <strong>không</strong> được lưu vào database hay bộ nhớ vĩnh viễn.</li>
+                <li>Token tự động bị xóa khi bạn đăng xuất hoặc phiên hết hạn (tối đa 2 giờ).</li>
+            </ul>
+
+            <h3>4.2. Dữ liệu người dùng</h3>
+            <ul>
+                <li>Thông tin cá nhân (tên, email, ảnh) chỉ tồn tại <strong>trong phiên đang hoạt động</strong>.</li>
+                <li>Chúng tôi <strong>không lưu trữ vĩnh viễn</strong> bất kỳ dữ liệu cá nhân nào.</li>
+                <li>Không có database chứa hồ sơ người dùng.</li>
+            </ul>
+
+            <h3>4.3. Nội dung file</h3>
+            <ul>
+                <li>Nội dung file của bạn <strong>không bao giờ</strong> đi qua server của chúng tôi.</li>
+                <li>Việc sao chép diễn ra trực tiếp trên hạ tầng Google thông qua API.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Chia sẻ dữ liệu</h2>
+            <p>
+                Chúng tôi <strong>không chia sẻ, bán, hoặc cho thuê</strong> thông tin cá nhân của bạn cho bất kỳ bên
+                thứ ba nào.
+                Dữ liệu chỉ được truyền giữa trình duyệt của bạn và Google API.
+            </p>
+            <p>Các dịch vụ bên thứ ba duy nhất được sử dụng:</p>
+            <ul>
+                <li><strong>Google OAuth 2.0</strong> — Dùng cho xác thực.</li>
+                <li><strong>Google Drive API v3</strong> — Dùng để thực hiện các thao tác trên Drive.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Tuân thủ Google API Services User Data Policy</h2>
+            <p>
+                Việc sử dụng và chuyển giao thông tin nhận được từ Google APIs của Drive Copy sang bất kỳ ứng dụng nào
+                khác
+                sẽ tuân thủ
+                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank"
+                    rel="noopener">
+                    Google API Services User Data Policy</a>, bao gồm các yêu cầu Limited Use.
+            </p>
+            <p>Cụ thể, ứng dụng của chúng tôi:</p>
+            <ul>
+                <li>Chỉ sử dụng dữ liệu Google Drive để cung cấp tính năng sao chép mà bạn yêu cầu.</li>
+                <li>Không sử dụng dữ liệu cho quảng cáo.</li>
+                <li>Không chuyển giao dữ liệu cho bên khác (trừ khi cần thiết cho tính năng hoặc tuân thủ pháp luật).
+                </li>
+                <li>Không sử dụng dữ liệu để đào tạo mô hình AI/ML.</li>
+                <li>Con người không đọc dữ liệu của bạn trừ khi bạn cho phép rõ ràng cho mục đích hỗ trợ, hoặc vì lý do
+                    bảo mật/pháp lý.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>7. Quyền của người dùng</h2>
+            <p>Bạn có quyền:</p>
+            <ul>
+                <li><strong>Đăng xuất bất kỳ lúc nào:</strong> Điều này sẽ xóa hoàn toàn phiên và token khỏi server.
+                </li>
+                <li><strong>Thu hồi quyền truy cập:</strong> Truy cập
+                    <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account
+                        Permissions</a>
+                    để gỡ quyền truy cập của ứng dụng.
+                </li>
+                <li><strong>Yêu cầu xóa dữ liệu:</strong> Vì chúng tôi không lưu trữ dữ liệu vĩnh viễn, việc đăng xuất
+                    sẽ tự động xóa dữ liệu khỏi hệ thống.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>8. Liên hệ</h2>
+            <p>
+                Nếu bạn có câu hỏi về Chính sách Quyền riêng tư này, vui lòng liên hệ:
+                <a href="mailto:support@drivecopy.app">support@drivecopy.app</a>
+            </p>
+        </section>
+
+        <div class="footer">
+            <a href="https://drivecopy.app">Trang chủ</a> ·
+            <a href="https://drivecopy.app/privacy">Chính sách Quyền riêng tư</a> ·
+            <a href="https://drivecopy.app/terms">Điều khoản Dịch vụ</a>
+            <br>&copy; 2026 Drive Copy. Không liên kết với Google Inc.
+        </div>
+    </div>
+</body>
+
+</html>

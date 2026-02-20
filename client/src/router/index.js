@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import DashboardView from '../views/DashboardView.vue'
-import PrivacyPolicyView from '../views/PrivacyPolicyView.vue'
-import TermsOfServiceView from '../views/TermsOfServiceView.vue'
 
 const routes = [
     {
@@ -17,13 +15,17 @@ const routes = [
     },
     {
         path: '/privacy',
-        name: 'PrivacyPolicy',
-        component: PrivacyPolicyView,
+        name: 'Privacy',
+        beforeEnter() {
+            window.location.href = '/privacy.html'
+        }
     },
     {
         path: '/terms',
-        name: 'TermsOfService',
-        component: TermsOfServiceView,
+        name: 'Terms',
+        beforeEnter() {
+            window.location.href = '/terms.html'
+        }
     },
 ]
 
